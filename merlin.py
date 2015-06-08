@@ -3,7 +3,6 @@ import tmdbsimple as tmdb
 import time
 
 tmdb.API_KEY = 'deb5d2f55e284931baf4f7e7020cfe44'
-a = tmdb.API_KEY
 
 genreDict = {u'Action': 28,
  u'Adventure': 12,
@@ -51,13 +50,14 @@ numToGenre = {1: u'Action',
 
 class Movie:
 
-    def __init__(self,title,ID,lan,genres,overview,rating):
+    def __init__(self,title,ID,lan,genres,overview,rating,release_date):
         self.title = title
         self.ID = ID
         self.lan = lan
         self.genres = genres
         self.overview = overview
         self.rating = rating
+        self.release_date = release_date
 
     def get_title(self):
         return self.title
@@ -77,6 +77,9 @@ class Movie:
     def get_rating(self):
         return self.rating 
     
+    def get_release_date(self):
+        return self.release_date
+
     def __repr__(self):
         return self.title
 
@@ -97,7 +100,7 @@ def findPerson(name):
             continue
     return nID
 
-def discoverMovie(genre,people):
+def discoverMovie(genre,cast,crew):
 
     discover = tmdb.Discover()
     tries = 0
@@ -105,7 +108,7 @@ def discoverMovie(genre,people):
     while tries < 4:
         tries += 1
         try:
-            response = discover.movie(with_people=people,with_genres=genre)
+            response = discover.movie(with_cast=cast,with_genres=genre,with_crew=crew)
             break
         except:
             continue 
@@ -116,7 +119,7 @@ def discoverMovie(genre,people):
 
     if response:
         for i in xrange(len(r)):
-            m = Movie(r[i]['title'],r[i]['id'],r[i]['original_language'],r[i]['genre_ids'],r[i]['overview'],r[i]['vote_average'])
+            m = Movie(r[i]['title'],r[i]['id'],r[i]['original_language'],r[i]['genre_ids'],r[i]['overview'],r[i]['vote_average'],r[i]['release_date'])
             result[i + 1] = m
 
     return result 
@@ -140,8 +143,8 @@ def discover():
     genre = genre[:-1]
 
     # Get the Cast
-    click.echo('Pick the cast and crew, Be as specific as you can and avoid spelling mistakes\n')
-    people = ''
+    click.echo('Pick the cast, Be as specific as you can and avoid spelling mistakes\n')
+    cast = ''
     while True:
         search = tmdb.Search()
         name = click.prompt('Give me a name')
@@ -151,8 +154,8 @@ def discover():
             for key in sorted(result.iterkeys()):
                 add = click.confirm('Are you looking for ' + key[1].encode('ascii','ignore'))
                 if add:
-                    people += str(result[key])
-                    people += ','
+                    cast += str(result[key])
+                    cast += ','
                     break;
         else:
             print 'Sorry, try again'
@@ -160,14 +163,40 @@ def discover():
         confirm = click.confirm('You want to add more people')
         if (confirm == False):
             break
-    people = people[:-1]
+    cast = cast[:-1]
+    
+    # Get the crew
+    click.echo('Pick the crew, Be as specific as you can and avoid spelling mistakes\n')
+    crew = ''
+    while True:
+        search = tmdb.Search()
+        name = click.prompt('Give me a name')
+
+        result = findPerson(name)
+        if (result):
+            for key in sorted(result.iterkeys()):
+                add = click.confirm('Are you looking for ' + key[1].encode('ascii','ignore'))
+                if add:
+                    crew += str(result[key])
+                    crew += ','
+                    break;
+        else:
+            print 'Sorry, try again'
+         
+        confirm = click.confirm('You want to add more people')
+        if (confirm == False):
+            break
+    crew = crew[:-1]
 
     # Get results
     click.echo('Sit back and Relax\n')
-    movies = discoverMovie(genre,people)
+    movies = discoverMovie(genre,cast,crew)
     if movies:
         for key in sorted(movies.iterkeys()):
             print movies[key].get_title(),
-            print movies[key].get_rating()
+            print movies[key].get_rating(),
+            print movies[key].get_release_date()
             print movies[key].get_overview()
             print '\n'
+    else:
+        print 'Sorry, try again'

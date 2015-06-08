@@ -100,15 +100,16 @@ def findPerson(name):
             continue
     return nID
 
-def discoverMovie(genre,cast,crew):
+# Find movies based on the given data
 
+def discoverMovie(genre,cast,crew):
     discover = tmdb.Discover()
     tries = 0
     response = None
     while tries < 4:
         tries += 1
         try:
-            response = discover.movie(with_cast=cast,with_genres=genre,with_crew=crew)
+            response = discover.movie(with_cast=cast,with_genres=genre,with_crew=crew,sort_by='vote_average.desc')
             break
         except:
             continue 
@@ -124,77 +125,86 @@ def discoverMovie(genre,cast,crew):
 
     return result 
 
+# Starts from here
+
 @click.command()
 def discover():
     click.echo("Let's find you a Movie\n")
-    for i in xrange(10):
-        print '.',
-        time.sleep(0.1)
+    time.sleep(0.5)
     print '\n' 
+
     # Get the Genre
-    for key in sorted(numToGenre.iterkeys()):
-        click.echo(str(key) + '. ' + numToGenre[key].encode('ascii','ignore'))
-    genre = click.prompt('Pick a Genre(comma separated) ')
-    gList = genre.split(',')
     genre = ''
-    for i in xrange(len(gList)):
-        genre += str(genreDict[numToGenre[int(gList[i])]])
-        genre += ','
-    genre = genre[:-1]
+    wantGenre = click.confirm('Do you want to a pick a genre ')
+    if wantGenre:
+        for key in sorted(numToGenre.iterkeys()):
+            click.echo(str(key) + '. ' + numToGenre[key].encode('ascii','ignore'))
+        g = click.prompt('Pick a Genre(comma separated) ')
+        gList = g.split(',')
+        for i in xrange(len(gList)):
+            genre += str(genreDict[numToGenre[int(gList[i])]])
+            genre += ','
+        genre = genre[:-1]
 
     # Get the Cast
-    click.echo('Pick the cast, Be as specific as you can and avoid spelling mistakes\n')
     cast = ''
-    while True:
-        search = tmdb.Search()
-        name = click.prompt('Give me a name')
+    wantCast = click.confirm('Do you want to specify the cast ')
+    if wantCast:
+        click.echo('Pick the cast, Be as specific as you can and avoid spelling mistakes\n')
+        while True:
+            search = tmdb.Search()
+            name = click.prompt('Give me a name')
 
-        result = findPerson(name)
-        if (result):
-            for key in sorted(result.iterkeys()):
-                add = click.confirm('Are you looking for ' + key[1].encode('ascii','ignore'))
-                if add:
-                    cast += str(result[key])
-                    cast += ','
-                    break;
-        else:
-            print 'Sorry, try again'
-         
-        confirm = click.confirm('You want to add more people')
-        if (confirm == False):
-            break
-    cast = cast[:-1]
+            result = findPerson(name)
+            if (result):
+                for key in sorted(result.iterkeys()):
+                    add = click.confirm('Are you looking for ' + key[1].encode('ascii','ignore'))
+                    if add:
+                        cast += str(result[key])
+                        cast += ','
+                        break;
+            else:
+                print 'Sorry, try again'
+             
+            confirm = click.confirm('You want to add more people')
+            if (confirm == False):
+                break
+        cast = cast[:-1]
     
     # Get the crew
-    click.echo('Pick the crew, Be as specific as you can and avoid spelling mistakes\n')
     crew = ''
-    while True:
-        search = tmdb.Search()
-        name = click.prompt('Give me a name')
+    wantCrew = click.confirm('Do you want to specify the crew ')
+    if wantCrew:
+        click.echo('Pick the crew, Be as specific as you can and avoid spelling mistakes\n')
+        while True:
+            search = tmdb.Search()
+            name = click.prompt('Give me a name')
 
-        result = findPerson(name)
-        if (result):
-            for key in sorted(result.iterkeys()):
-                add = click.confirm('Are you looking for ' + key[1].encode('ascii','ignore'))
-                if add:
-                    crew += str(result[key])
-                    crew += ','
-                    break;
-        else:
-            print 'Sorry, try again'
-         
-        confirm = click.confirm('You want to add more people')
-        if (confirm == False):
-            break
-    crew = crew[:-1]
+            result = findPerson(name)
+            if (result):
+                for key in sorted(result.iterkeys()):
+                    add = click.confirm('Are you looking for ' + key[1].encode('ascii','ignore'))
+                    if add:
+                        crew += str(result[key])
+                        crew += ','
+                        break;
+            else:
+                print 'Sorry, try again'
+             
+            confirm = click.confirm('You want to add more people')
+            if (confirm == False):
+                break
+        crew = crew[:-1]
 
     # Get results
     click.echo('Sit back and Relax\n')
+    print genre
     movies = discoverMovie(genre,cast,crew)
     if movies:
         for key in sorted(movies.iterkeys()):
+            print key,
             print movies[key].get_title(),
-            print movies[key].get_rating(),
+            print movies[key].get_rating()
             print movies[key].get_release_date()
             print movies[key].get_overview()
             print '\n'

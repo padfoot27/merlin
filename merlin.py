@@ -79,7 +79,69 @@ class Movie:
     
     def get_release_date(self):
         return self.release_date
+    
+    def findTrailer(self):
+        movie = tmdb.Movies(self.get_id())
+        tries = 0
+        trailer = []
+        while tries < 3:
+            tries += 1
+            try:
+                trailer = movie.videos()
+                trailer = trailer['results']
+                break
+            except:
+                continue 
+        result = []
 
+        for i in xrange(len(trailer)):
+             result.append('https://www.youtube.com/watch?v=' + trailer[i]['key'].encode('ascii','ignore'))
+        return result 
+
+    def findCastAndCrew(self):
+        movie = tmdb.Movies(self.get_id())
+        tries = 0
+        cast = []
+        crew = []
+        while tries < 3:
+            tries += 1
+            try:
+                credits = movie.credits()
+                cast = credits['cast']
+                crew = credits['crew']
+                break 
+            except:
+                continue 
+        ca = []
+        cr = []
+
+        for i in xrange(len(cast)):
+            ca.append(cast[i]['name'].encode('ascii','ignore') + ' As ' + cast[i]['character'].encode('ascii','ignore'))
+
+        for i in xrange(len(crew)):
+            cr.append((crew[i]['name'].encode('ascii','ignore'),crew[i]['job'].encode('ascii','ignore')))
+        return ca,cr
+
+    def findKeywords(self):
+        movie = tmdb.Movies(self.get_id())
+        keywords = []
+        tries = 0
+
+        while tries < 3:
+            tries += 1
+            try:
+                keywords = movie.keywords()
+                keywords = keywords['keywords']
+                break
+            except:
+                continue 
+
+        result = ''
+        for i in xrange(len(keywords)):
+            result += keywords[i]['name'].encode('ascii','ignore') + ','
+        
+        return result[:-1]
+            
     def __repr__(self):
         return self.title
 
@@ -127,6 +189,7 @@ def discoverMovie(genre,cast,crew,language):
 
     return result 
 
+
 # Starts from here
 
 @click.command()
@@ -134,11 +197,11 @@ def discover():
     '''Merlin's here'''
     click.echo("Let's find you a Movie\n")
     time.sleep(0.5)
-    print '\n' 
 
     # Get the Language
     language = 'en'
     wantLanguage = click.confirm('Do you want to pick the language,default is english')
+    click.echo('\n')
     if wantLanguage:
         justEN = click.confirm('All languages')
         if justEN:
@@ -150,7 +213,7 @@ def discover():
     if wantGenre:
         for key in sorted(numToGenre.iterkeys()):
             click.echo(str(key) + '. ' + numToGenre[key].encode('ascii','ignore'))
-        g = click.prompt('Pick a Genre(comma separated) ')
+        g = click.prompt('\nPick a Genre(comma separated)')
         gList = g.split(',')
         for i in xrange(len(gList)):
             genre += str(genreDict[numToGenre[int(gList[i])]])
@@ -160,6 +223,7 @@ def discover():
     # Get the Cast
     cast = ''
     wantCast = click.confirm('Do you want to specify the cast ')
+    click.echo('\n')
     if wantCast:
         click.echo('Pick the cast, Be as specific as you can and avoid spelling mistakes\n')
         while True:
@@ -181,10 +245,12 @@ def discover():
             if (confirm == False):
                 break
         cast = cast[:-1]
+
     
     # Get the crew
     crew = ''
     wantCrew = click.confirm('Do you want to specify the crew ')
+    click.echo('\n')
     if wantCrew:
         click.echo('Pick the crew, Be as specific as you can and avoid spelling mistakes\n')
         while True:
@@ -212,11 +278,47 @@ def discover():
     movies = discoverMovie(genre,cast,crew,language)
     if movies:
         for key in sorted(movies.iterkeys()):
-            print key,
             print movies[key].get_title(),
             print movies[key].get_rating()
             print movies[key].get_release_date()
             print movies[key].get_overview()
             print '\n'
+
+            wantDetails = click.confirm('Do you want more details regarding this movie ')
+            click.echo('\n')
+            if wantDetails:
+                click.echo('Wait up\n')
+                cast,crew = movies[key].findCastAndCrew()
+    
+                click.echo('Full Cast')
+                for i in xrange(min(len(cast),12)):
+                    click.echo(cast[i])
+
+                click.echo('\n')
+
+                click.echo('Full Crew')
+                for i in xrange(len(crew)):
+                    if (crew[i][1] in ['Director','Screenplay','Editor','Producer','Writer','Original Music Composer']):
+                        click.echo(crew[i][0] + ' ... ' + crew[i][1])
+
+                click.echo('\n')
+                
+                click.echo('Getting the keywords for the movie\n') 
+                keywords = movies[key].findKeywords()
+                click.echo(keywords)
+
+
+            wantTrailer = click.confirm('Would you like to see the trailer')
+            click.echo('\n')
+            if wantTrailer:
+                trailer = movies[key].findTrailer() 
+
+                for i in xrange(len(trailer)):
+                    click.echo(trailer[i])
+
+            wantQuit = click.confirm('Do you want to look at more movies')
+            click.echo('\n')
+            if wantQuit == False:
+                break
     else:
         print 'Sorry, try again'

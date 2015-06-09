@@ -89,7 +89,7 @@ def findPerson(name):
     search = tmdb.Search()
     nID = {}
     tries = 0
-    while tries < 4:
+    while tries < 3:
         tries += 1
         try:    
             response = search.person(query=name)
@@ -102,14 +102,16 @@ def findPerson(name):
 
 # Find movies based on the given data
 
-def discoverMovie(genre,cast,crew):
+def discoverMovie(genre,cast,crew,language):
+    
     discover = tmdb.Discover()
     tries = 0
     response = None
-    while tries < 4:
+    kwargs = {'with_cast':cast,'with_crew':crew,'with_genres':genre,'language':language,'primary_release_date.gte':'2000-01-01'}
+    while tries < 3:
         tries += 1
         try:
-            response = discover.movie(with_cast=cast,with_genres=genre,with_crew=crew,sort_by='vote_average.desc')
+            response = discover.movie(**kwargs)
             break
         except:
             continue 
@@ -129,9 +131,18 @@ def discoverMovie(genre,cast,crew):
 
 @click.command()
 def discover():
+    '''Merlin's here'''
     click.echo("Let's find you a Movie\n")
     time.sleep(0.5)
     print '\n' 
+
+    # Get the Language
+    language = 'en'
+    wantLanguage = click.confirm('Do you want to pick the language,default is english')
+    if wantLanguage:
+        justEN = click.confirm('All languages')
+        if justEN:
+           language = '' 
 
     # Get the Genre
     genre = ''
@@ -198,8 +209,7 @@ def discover():
 
     # Get results
     click.echo('Sit back and Relax\n')
-    print genre
-    movies = discoverMovie(genre,cast,crew)
+    movies = discoverMovie(genre,cast,crew,language)
     if movies:
         for key in sorted(movies.iterkeys()):
             print key,

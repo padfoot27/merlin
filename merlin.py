@@ -195,7 +195,9 @@ def discoverMovie(genre,cast,crew,language):
 @click.command()
 def discover():
     '''Merlin's here'''
-    click.echo("Let's find you a Movie\n")
+    click.echo("Hi, I am Merlin, google's dumb cousin, your personal movie recommender\n")
+    time.sleep(1)
+    click.echo("So,let's find you a Movie\n")
     time.sleep(0.5)
 
     # Get the Language
@@ -204,16 +206,19 @@ def discover():
     click.echo('\n')
     if wantLanguage:
         justEN = click.confirm('All languages')
+        click.echo('\n')
         if justEN:
            language = '' 
 
     # Get the Genre
     genre = ''
     wantGenre = click.confirm('Do you want to a pick a genre ')
+    click.echo('\n')
     if wantGenre:
         for key in sorted(numToGenre.iterkeys()):
             click.echo(str(key) + '. ' + numToGenre[key].encode('ascii','ignore'))
         g = click.prompt('\nPick a Genre(comma separated)')
+        click.echo('\n')
         gList = g.split(',')
         for i in xrange(len(gList)):
             genre += str(genreDict[numToGenre[int(gList[i])]])
@@ -229,19 +234,22 @@ def discover():
         while True:
             search = tmdb.Search()
             name = click.prompt('Give me a name')
-
+            click.echo('\n')
             result = findPerson(name)
             if (result):
                 for key in sorted(result.iterkeys()):
                     add = click.confirm('Are you looking for ' + key[1].encode('ascii','ignore'))
+                    click.echo('\n')
                     if add:
                         cast += str(result[key])
                         cast += ','
                         break;
             else:
                 print 'Sorry, try again'
+                click.echo('\n')
              
             confirm = click.confirm('You want to add more people')
+            click.echo('\n')
             if (confirm == False):
                 break
         cast = cast[:-1]
@@ -256,19 +264,23 @@ def discover():
         while True:
             search = tmdb.Search()
             name = click.prompt('Give me a name')
+            click.echo('\n')
 
             result = findPerson(name)
             if (result):
                 for key in sorted(result.iterkeys()):
                     add = click.confirm('Are you looking for ' + key[1].encode('ascii','ignore'))
+                    click.echo('\n')
                     if add:
                         crew += str(result[key])
                         crew += ','
                         break;
             else:
                 print 'Sorry, try again'
+                click.echo('\n')
              
             confirm = click.confirm('You want to add more people')
+            click.echo('\n')
             if (confirm == False):
                 break
         crew = crew[:-1]
@@ -276,7 +288,10 @@ def discover():
     # Get results
     click.echo('Sit back and Relax\n')
     movies = discoverMovie(genre,cast,crew,language)
+    found = False
+
     if movies:
+        found = True 
         for key in sorted(movies.iterkeys()):
             print movies[key].get_title(),
             print movies[key].get_rating()
@@ -305,20 +320,30 @@ def discover():
                 
                 click.echo('Getting the keywords for the movie\n') 
                 keywords = movies[key].findKeywords()
-                click.echo(keywords)
+                if keywords:
+                    click.echo(keywords)
+                else:
+                    click.echo('Nothing Found')
+                click.echo('\n')
 
 
             wantTrailer = click.confirm('Would you like to see the trailer')
             click.echo('\n')
             if wantTrailer:
                 trailer = movies[key].findTrailer() 
-
-                for i in xrange(len(trailer)):
-                    click.echo(trailer[i])
+                if trailer:
+                    for i in xrange(len(trailer)):
+                        click.echo(trailer[i])
+                else:
+                    click.echo('Nothing Found')
+            click.echo('\n')
 
             wantQuit = click.confirm('Do you want to look at more movies')
             click.echo('\n')
             if wantQuit == False:
                 break
     else:
-        print 'Sorry, try again'
+        click.echo('Sorry, try again')
+
+    if found:
+        click.echo("That's all Folks,Merlin says goodbye\n")

@@ -198,7 +198,6 @@ def discover():
     click.echo("Hi, I am Merlin, google's dumb cousin, your personal movie recommender\n")
     time.sleep(1)
     click.echo("So,let's find you a Movie\n")
-    time.sleep(0.5)
 
     # Get the Language
     language = 'en'
@@ -327,16 +326,16 @@ def discover():
                 click.echo('\n')
 
 
-            wantTrailer = click.confirm('Would you like to see the trailer')
-            click.echo('\n')
-            if wantTrailer:
-                trailer = movies[key].findTrailer() 
-                if trailer:
-                    for i in xrange(len(trailer)):
-                        click.echo(trailer[i])
-                else:
-                    click.echo('Nothing Found')
-            click.echo('\n')
+                wantTrailer = click.confirm('Would you like to see the trailer')
+                click.echo('\n')
+                if wantTrailer:
+                    trailer = movies[key].findTrailer() 
+                    if trailer:
+                        for i in xrange(len(trailer)):
+                            click.echo(trailer[i])
+                    else:
+                        click.echo('Nothing Found')
+                click.echo('\n')
 
             wantQuit = click.confirm('Do you want to look at more movies')
             click.echo('\n')

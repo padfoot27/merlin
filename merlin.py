@@ -164,7 +164,7 @@ def findPerson(name):
 
 # Find movies based on the given data
 
-def discoverMovie(genre,cast,crew,language,year):
+def discoverMovie(genre,cast,crew,language,year,page):
     
     discover = tmdb.Discover()
     tries = 0
@@ -172,7 +172,7 @@ def discoverMovie(genre,cast,crew,language,year):
     date = ''
     if year:
         date = year + '-01-01'
-    kwargs = {'with_cast':cast,'with_crew':crew,'with_genres':genre,'language':language,'primary_release_date.gte':date}
+    kwargs = {'with_cast':cast,'with_crew':crew,'with_genres':genre,'language':language,'primary_release_date.gte':date,'page':page}
     while tries < 3:
         tries += 1
         try:
@@ -190,7 +190,7 @@ def discoverMovie(genre,cast,crew,language,year):
             m = Movie(r[i]['title'],r[i]['id'],r[i]['original_language'],r[i]['genre_ids'],r[i]['overview'],r[i]['vote_average'],r[i]['release_date'])
             result[i + 1] = m
 
-    return result 
+    return result,response['total_pages'],response['total_results'] 
 
 
 # Starts from here
@@ -233,7 +233,7 @@ def discover():
     click.echo('\n')
     if wantYear:
         year = click.prompt('Pick a year (YYYY)')
-    click.echo('\n')
+        click.echo('\n')
 
     # Get the Cast
     cast = ''
@@ -297,63 +297,85 @@ def discover():
 
     # Get results
     click.echo('Sit back and Relax\n')
-    movies = discoverMovie(genre,cast,crew,language,year)
-    found = False
+    page = 1
 
-    if movies:
-        found = True 
-        for key in sorted(movies.iterkeys()):
-            print movies[key].get_title(),
-            print movies[key].get_rating()
-            print movies[key].get_release_date()
-            print movies[key].get_overview()
-            print '\n'
+    castSearch = cast
+    crewSearch = crew
+    tPages = 0
+    tResults = 0
 
-            wantDetails = click.confirm('Do you want more details regarding this movie ')
-            click.echo('\n')
-            if wantDetails:
-                click.echo('Wait up\n')
-                cast,crew = movies[key].findCastAndCrew()
-    
-                click.echo('Full Cast')
-                for i in xrange(min(len(cast),12)):
-                    click.echo(cast[i])
+    while True: 
+        if page > 1:
+            click.echo('Looking for more results\n')
+        movies,tPages,tResults = discoverMovie(genre,castSearch,crewSearch,language,year,page)
+        wantQuit = False
 
+        if movies:
+                       
+            page += 1
+
+            for key in sorted(movies.iterkeys()):
+                print movies[key].get_title(),
+                print movies[key].get_rating()
+                print movies[key].get_release_date()
+                print movies[key].get_overview()
+                print '\n'
+
+                wantDetails = click.confirm('Do you want more details regarding this movie ')
                 click.echo('\n')
+                if wantDetails:
+                    click.echo('Wait up\n')
+                    cast,crew = movies[key].findCastAndCrew()
+        
+                    click.echo('Full Cast')
+                    for i in xrange(min(len(cast),12)):
+                        click.echo(cast[i])
 
-                click.echo('Full Crew')
-                for i in xrange(len(crew)):
-                    if (crew[i][1] in ['Director','Screenplay','Editor','Producer','Writer','Original Music Composer']):
-                        click.echo(crew[i][0] + ' ... ' + crew[i][1])
+                    click.echo('\n')
 
-                click.echo('\n')
-                
-                click.echo('Getting the keywords for the movie\n') 
-                keywords = movies[key].findKeywords()
-                if keywords:
-                    click.echo(keywords)
-                else:
-                    click.echo('Nothing Found')
-                click.echo('\n')
+                    click.echo('Full Crew')
+                    for i in xrange(len(crew)):
+                        if (crew[i][1] in ['Director','Screenplay','Editor','Producer','Writer','Original Music Composer']):
+                            click.echo(crew[i][0] + ' ... ' + crew[i][1])
 
-
-                wantTrailer = click.confirm('Would you like to see the trailer')
-                click.echo('\n')
-                if wantTrailer:
-                    trailer = movies[key].findTrailer() 
-                    if trailer:
-                        for i in xrange(len(trailer)):
-                            click.echo(trailer[i])
+                    click.echo('\n')
+                    
+                    click.echo('Getting the keywords for the movie\n') 
+                    keywords = movies[key].findKeywords()
+                    if keywords:
+                        click.echo(keywords)
                     else:
                         click.echo('Nothing Found')
+                    click.echo('\n')
+
+
+                    wantTrailer = click.confirm('Would you like to see the trailer')
+                    click.echo('\n')
+                    if wantTrailer:
+                        trailer = movies[key].findTrailer() 
+                        if trailer:
+                            for i in xrange(len(trailer)):
+                                click.echo(trailer[i])
+                        else:
+                            click.echo('Nothing Found')
+                    click.echo('\n')
+
+                wantQuit = click.confirm('Do you want to look at more movies')
                 click.echo('\n')
+                if wantQuit == False:
+                    break
+                
+        else:
+            if tResults == 0:
+                click.echo('Nothing found\n')
+                break 
 
-            wantQuit = click.confirm('Do you want to look at more movies')
-            click.echo('\n')
-            if wantQuit == False:
+            elif page > tPages:
+                click.echo('End of the results\n')
                 break
-    else:
-        click.echo('Sorry, try again')
-
-    if found:
-        click.echo("That's all Folks,Merlin says goodbye\n")
+            else:
+                click.echo('Sorry, try again')
+        
+        if wantQuit == False:
+            break
+    click.echo("That's all Folks,Merlin says goodbye\n")

@@ -1,0 +1,11 @@
+setup.cfg
+setup.py
+movieMerlin.egg-info/PKG-INFO
+movieMerlin.egg-info/SOURCES.txt
+movieMerlin.egg-info/dependency_links.txt
+movieMerlin.egg-info/entry_points.txt
+movieMerlin.egg-info/requires.txt
+movieMerlin.egg-info/top_level.txt
+package/__init__.py
+package/scripts/__init__.py
+package/scripts/merlin.py

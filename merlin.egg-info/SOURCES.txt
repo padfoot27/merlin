@@ -1,3 +1,5 @@
+setup.cfg
+setup.py
 merlin.egg-info/PKG-INFO
 merlin.egg-info/SOURCES.txt
 merlin.egg-info/dependency_links.txt

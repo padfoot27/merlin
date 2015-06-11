@@ -190,15 +190,34 @@ def discoverMovie(genre,cast,crew,language,year,page):
             m = Movie(r[i]['title'],r[i]['id'],r[i]['original_language'],r[i]['genre_ids'],r[i]['overview'],r[i]['vote_average'],r[i]['release_date'])
             result[i + 1] = m
 
-    return result,response['total_pages'],response['total_results'] 
-
+    if response:
+        return result,response['total_pages'],response['total_results'] 
+    
+    else:
+        return result,0,0
 
 # Starts from here
 
 @click.command()
 def discover():
-    '''Merlin's here'''
-    click.echo("Hi, I am Merlin, google's dumb cousin, your personal movie recommender\n")
+    '''
+        This is Merlin 
+        
+        He is google's dumb cousin who can search for movies
+
+        He is a tad slow, so please be patient with him
+
+        He is dumb too, so while telling him about names of the cast or crew, make sure to avoid spelling mistakes
+
+        For example, you are looking for Arnold Schwarzenegger, you just tell him arnold and he will find him
+
+        If you are looking for Anne Hathaway, you just tell him anne, and so on
+
+        If you will misspell a name he won't be able to find the intended person 
+        
+        So, just follow the instructions and let Merlin weave his spell 
+    '''
+    click.echo("Hi, I am Merlin, your personal movie recommender\n")
     time.sleep(1)
     click.echo("So,let's find you a Movie\n")
 
@@ -315,8 +334,9 @@ def discover():
             page += 1
 
             for key in sorted(movies.iterkeys()):
-                print movies[key].get_title(),
-                print movies[key].get_rating()
+                click.echo(movies[key].get_title() + '   ' + str(movies[key].get_rating())),
+                #print movies[key].get_title(),
+                #print movies[key].get_rating()
                 print movies[key].get_release_date()
                 print movies[key].get_overview()
                 print '\n'
@@ -327,13 +347,13 @@ def discover():
                     click.echo('Wait up\n')
                     cast,crew = movies[key].findCastAndCrew()
         
-                    click.echo('Full Cast')
+                    click.echo('Cast')
                     for i in xrange(min(len(cast),12)):
                         click.echo(cast[i])
 
                     click.echo('\n')
 
-                    click.echo('Full Crew')
+                    click.echo('Crew')
                     for i in xrange(len(crew)):
                         if (crew[i][1] in ['Director','Screenplay','Editor','Producer','Writer','Original Music Composer']):
                             click.echo(crew[i][0] + ' ... ' + crew[i][1])

@@ -1,4 +1,4 @@
 
             [console_scripts]
-            merlin=merlin:discover
+            merlin=package.scripts.merlin:discover
         

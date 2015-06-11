@@ -1,7 +1,9 @@
-merlin.py
 merlin.egg-info/PKG-INFO
 merlin.egg-info/SOURCES.txt
 merlin.egg-info/dependency_links.txt
 merlin.egg-info/entry_points.txt
 merlin.egg-info/requires.txt
 merlin.egg-info/top_level.txt
+package/__init__.py
+package/scripts/__init__.py
+package/scripts/merlin.py

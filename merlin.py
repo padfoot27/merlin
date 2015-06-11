@@ -164,12 +164,15 @@ def findPerson(name):
 
 # Find movies based on the given data
 
-def discoverMovie(genre,cast,crew,language):
+def discoverMovie(genre,cast,crew,language,year):
     
     discover = tmdb.Discover()
     tries = 0
     response = None
-    kwargs = {'with_cast':cast,'with_crew':crew,'with_genres':genre,'language':language,'primary_release_date.gte':'2000-01-01'}
+    date = ''
+    if year:
+        date = year + '-01-01'
+    kwargs = {'with_cast':cast,'with_crew':crew,'with_genres':genre,'language':language,'primary_release_date.gte':date}
     while tries < 3:
         tries += 1
         try:
@@ -223,6 +226,14 @@ def discover():
             genre += str(genreDict[numToGenre[int(gList[i])]])
             genre += ','
         genre = genre[:-1]
+
+    # Get the year
+    year = ''
+    wantYear = click.confirm('Do you want to pick a year, only movies after this year will be picked')
+    click.echo('\n')
+    if wantYear:
+        year = click.prompt('Pick a year (YYYY)')
+    click.echo('\n')
 
     # Get the Cast
     cast = ''
@@ -286,7 +297,7 @@ def discover():
 
     # Get results
     click.echo('Sit back and Relax\n')
-    movies = discoverMovie(genre,cast,crew,language)
+    movies = discoverMovie(genre,cast,crew,language,year)
     found = False
 
     if movies:

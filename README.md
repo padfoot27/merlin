@@ -39,4 +39,4 @@ pip install movieMerlin
 
 ##PyPI Link
 
-[movieMerlin-0.2]('https://pypi.python.org/pypi/movieMerlin/0.2')
+[movieMerlin-0.2](https://pypi.python.org/pypi/movieMerlin/0.2)

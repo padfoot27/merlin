@@ -4,7 +4,7 @@ Merlin is a command line tool that can help you search for movies based on genre
 
 ## Commands -
 
-*merlin--help* - **Reveals the help text**
+*merlin --help* - **Reveals the help text**
 
 *merlin* - **Kickstarts the recommender**
 
@@ -23,6 +23,8 @@ Merlin is a command line tool that can help you search for movies based on genre
 - Not picking anything will give you a list of Popular Movies right now.
 
  *You are free to choose or not to choose any of the above options.*
+
+*merlin similar* - **Finds you movies similar to the one you provide**
 
 ##Installation
 

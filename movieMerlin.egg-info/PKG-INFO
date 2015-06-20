@@ -1,11 +1,11 @@
 Metadata-Version: 1.1
 Name: movieMerlin
-Version: 0.1
-Summary: A personal movie recommender
+Version: 0.2
+Summary: A command line tool that finds you movies
 Home-page: https://github.com/padfoot27/merlin
 Author: Siddharth Verma
 Author-email: siddharthv93@gmail.com
-License: UNKNOWN
-Download-URL: https://github.com/padfoot27/merlin/tarball/0.1
+License: MIT License
+Download-URL: https://github.com/padfoot27/merlin/tarball/0.2
 Description: UNKNOWN
 Platform: UNKNOWN

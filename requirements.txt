@@ -34,7 +34,7 @@ duplicity==0.6.23
 enum34==1.0.4
 goodreads==0.2.3
 html5lib==0.999
-httplib2==0.8
+httplib2==0.19.0
 ipython==1.2.1
 itsdangerous==0.24
 jellyfish==0.5.0
